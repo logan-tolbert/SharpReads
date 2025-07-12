@@ -2,6 +2,7 @@
 using App.Api.Endpoints;
 using App.Application.Interfaces;
 using App.Infrastructure.Services;
+using App.Infrastructure.Repositories;
 using Microsoft.AspNetCore.WebUtilities;
 using Scalar.AspNetCore;
 
@@ -26,6 +27,7 @@ builder.Services.AddAuthentication("ApiKey")
 
 builder.Services.AddAuthorization();
 builder.Services.AddSingleton<IApiKeyService, ApiKeyService>();
+builder.Services.AddSingleton<IBookRepository, BookRepository>();
 builder.Services.AddSingleton<IBookService, BookService>();
 
 var app = builder.Build();

@@ -46,7 +46,7 @@ public static class V1BookEndpoints
     return Results.Ok(response);
   }
 
-  private static async Task<IResult> GetPublicBookDetailsAsync(string id, IBookService bookService)
+  private static async Task<IResult> GetPublicBookDetailsAsync(int id, IBookService bookService)
   {
     var book = await bookService.GetBookByIdAsync(id);
     
