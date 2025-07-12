@@ -9,11 +9,6 @@ public class BookService : IBookService
     private readonly ILogger<BookService> _logger;
     private readonly IBookRepository _repo;
 
-  public BookService(IBookRepository repo)
-  {
-    _repo = repo;
-  }
-
   public BookService(ILogger<BookService> logger, IBookRepository repo)
     {
         _logger = logger;
@@ -40,9 +35,26 @@ public class BookService : IBookService
         return publicBooks;
     }
 
-    public Task<IEnumerable<Book>> GetAllBooksAsync()
+    public async Task<IEnumerable<Book>> GetAllBooksAsync()
     {
-        return _repo.GetAllAsync();
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        
+        try
+        {
+            _logger.LogInformation("Info: Retrieving all books.");
+            
+            var books = await _repo.GetAllAsync();
+            
+            stopwatch.Stop();
+            _logger.LogInformation("Info: Books retrieved in {0}ms", stopwatch.ElapsedMilliseconds);
+            
+            return books;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error: An error occurred while retrieving all books.");
+            throw;
+        }
     }
 
     public Task<Book?> GetBookByIdAsync(int id)
