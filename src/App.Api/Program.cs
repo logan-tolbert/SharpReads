@@ -18,6 +18,8 @@ builder.Services.Configure<ScalarOptions>(options =>
   options.WithTheme(ScalarTheme.Saturn);
 });
 
+
+
 // Add API Key authentication
 builder.Services.AddAuthentication("ApiKey")
     .AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", options => { });

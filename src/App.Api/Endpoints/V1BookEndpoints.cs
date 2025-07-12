@@ -1,3 +1,4 @@
+using App.Application.DTOs.Responses;
 using App.Application.Interfaces;
 
 namespace App.Api.Endpoints;
@@ -11,7 +12,7 @@ public static class V1BookEndpoints
         .WithSummary("Get public books catalog")
         .WithDescription("Returns a limited books catalog for public browsing (no authentication required)")
         .WithOpenApi()
-        .Produces<object>(200)
+        .Produces<PublicBooksResponse>(200)
         .AllowAnonymous();
 
     app.MapGet("/v1/books/{id}", GetPublicBookDetailsAsync)
@@ -19,7 +20,7 @@ public static class V1BookEndpoints
         .WithSummary("Get public book details")
         .WithDescription("Returns basic book information for public viewing (no authentication required)")
         .WithOpenApi()
-        .Produces<object>(200)
+        .Produces<PublicBookResponse>(200)
         .Produces(404)
         .AllowAnonymous();
   }
@@ -28,19 +29,21 @@ public static class V1BookEndpoints
   {
     var books = await bookService.GetPublicBooksAsync();
     
-    return Results.Ok(new
+    var response = new PublicBooksResponse
     {
-      message = "Welcome to SharpReads! Here are some featured books:",
-      books = books.Select(b => new 
+      Message = "Welcome to SharpReads! Here are some featured books:",
+      Books = books.Select(b => new PublicBookResponse
       { 
-        id = b.Id, 
-        title = b.Title, 
-        author = b.Author, 
-        genre = b.Genre,
-        publishedYear = b.PublishedYear
-      }),
-      note = "For complete catalog and pricing, please get an API key"
-    });
+        Id = b.Id, 
+        Title = b.Title, 
+        Author = b.Author, 
+        Genre = b.Genre,
+        PublishedYear = b.PublishedYear
+      }).ToList(),
+      Note = "For complete catalog and pricing, please get an API key"
+    };
+    
+    return Results.Ok(response);
   }
 
   private static async Task<IResult> GetPublicBookDetailsAsync(string id, IBookService bookService)
@@ -52,14 +55,15 @@ public static class V1BookEndpoints
       return Results.NotFound(new { message = "Book not found" });
     }
 
-    return Results.Ok(new
+    var response = new PublicBookResponse
     {
-      id = book.Id,
-      title = book.Title,
-      author = book.Author,
-      genre = book.Genre,
-      description = book.Description ?? "No description available.",
-      publishedYear = book.PublishedYear
-    });
+      Id = book.Id,
+      Title = book.Title,
+      Author = book.Author,
+      Genre = book.Genre,
+      PublishedYear = book.PublishedYear
+    };
+    
+    return Results.Ok(response);
   }
 } 

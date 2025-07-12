@@ -1,4 +1,5 @@
-﻿using App.Application.Interfaces;
+﻿using App.Application.DTOs.Responses;
+using App.Application.Interfaces;
 using System.Security.Claims;
 
 namespace App.Api.Endpoints;
@@ -12,7 +13,7 @@ public static class V2BookEndpoints
         .WithSummary("Get books catalog (authenticated)")
         .WithDescription("Returns the complete books catalog with pricing and availability (requires valid API key)")
         .WithOpenApi()
-        .Produces<object>(200)
+        .Produces<BooksCatalogResponse>(200)
         .Produces(401)
         .RequireAuthorization();
   }
@@ -22,22 +23,26 @@ public static class V2BookEndpoints
     var clientName = user.FindFirst("ClientName")?.Value;
     var books = await bookService.GetAllBooksAsync();
     
-    return Results.Ok(new
+    var response = new BooksCatalogResponse
     {
-      message = $"Hello {clientName}, here are your books!",
-      books = books.Select(b => new 
+      Message = $"Hello {clientName}, here are your books!",
+      Books = books.Select(b => new BookResponse
       { 
-        id = b.Id, 
-        title = b.Title, 
-        author = b.Author, 
-        genre = b.Genre,
-        publishedYear = b.PublishedYear,
-        price = b.Price,
-        isAvailable = b.IsAvailable,
-        description = b.Description
-      }),
-      pricing = new { currency = "USD", discount = "10%" },
-      totalCount = books.Count()
-    });
+        Id = b.Id, 
+        Title = b.Title, 
+        Author = b.Author, 
+        Genre = b.Genre,
+        PublishedYear = b.PublishedYear,
+        Price = b.Price,
+        IsAvailable = b.IsAvailable,
+        Description = b.Description,
+        CreatedAt = b.CreatedAt,
+        UpdatedAt = b.UpdatedAt
+      }).ToList(),
+      Pricing = new PricingInfo { Currency = "USD", Discount = "10%" },
+      TotalCount = books.Count()
+    };
+    
+    return Results.Ok(response);
   }
 }
