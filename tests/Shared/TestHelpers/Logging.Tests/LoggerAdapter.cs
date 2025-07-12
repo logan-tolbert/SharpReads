@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Logging.Tests;
+namespace Logging;
 
 public class LoggerAdapter<TType> : ILoggerAdapter<TType>
 {

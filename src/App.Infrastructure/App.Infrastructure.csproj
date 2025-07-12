@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\tests\Shared\TestHelpers\Logging.Tests\Logging.csproj" />
     <ProjectReference Include="..\App.Application\App.Application.csproj" />
     <ProjectReference Include="..\App.Core\App.Core.csproj" />
   </ItemGroup>

@@ -1,15 +1,15 @@
 ﻿using App.Application.DTOs.Responses;
 using App.Application.Interfaces;
 using App.Core.Entities;
-using Microsoft.Extensions.Logging;
+using Logging;
 namespace App.Infrastructure.Services;
 
 public class ApiKeyService : IApiKeyService
 {
   private readonly Dictionary<string, ApiKeyInfo> _apiKeys = new();
-  private readonly ILogger<ApiKeyService> _logger;
+  private readonly ILoggerAdapter<ApiKeyService> _logger;
 
-  public ApiKeyService(ILogger<ApiKeyService> logger)
+  public ApiKeyService(ILoggerAdapter<ApiKeyService> logger)
   {
     _logger = logger;
   }
@@ -29,7 +29,7 @@ public class ApiKeyService : IApiKeyService
     };
 
     _apiKeys[apiKey] = keyInfo;
-    _logger.LogInformation("API Key generated for client: {ClientName}", clientName);
+    _logger.LogInformation("API Key generated for client: {0}", clientName);
 
     return Task.FromResult(new ApiKeyResponse
     {

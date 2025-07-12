@@ -2,7 +2,7 @@
 using App.Core.Entities;
 using App.Infrastructure.Services;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
+using Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Xunit;
@@ -13,7 +13,7 @@ public class BookServiceTests
 {
   private readonly BookService _sut;
   private readonly IBookRepository _repo = Substitute.For<IBookRepository>();
-  private readonly ILogger<BookService> _logger = Substitute.For<ILogger<BookService>>();
+  private readonly ILoggerAdapter<BookService> _logger = Substitute.For<ILoggerAdapter<BookService>>();
 
   public BookServiceTests()
   {
@@ -81,7 +81,7 @@ public class BookServiceTests
   public async Task GetAllBooksAsync_ShouldLogMessageandException_WhenErrorOccurs()
   {
     // Arrange
-    var message = "An error occurred while retrieving all books.";
+    var message = "Error: An error occurred while retrieving all books.";
     var exception = new Exception(message);
     _repo.GetAllAsync().Throws(exception);
 

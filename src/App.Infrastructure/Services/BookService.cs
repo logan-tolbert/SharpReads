@@ -1,17 +1,18 @@
 ﻿using App.Application.Interfaces;
 using App.Core.Entities;
+using Logging;
 using Microsoft.Extensions.Logging;
 
 namespace App.Infrastructure.Services;
 
 public class BookService : IBookService
 {
-    private readonly ILogger<BookService> _logger;
+    private readonly ILoggerAdapter<BookService> _logger;
     private readonly IBookRepository _repo;
 
-  public BookService(ILogger<BookService> logger, IBookRepository repo)
+  public BookService(ILoggerAdapter<BookService> logger, IBookRepository repo)
     {
-        _logger = logger;
+    _logger = logger;
         _repo = repo;
     }
 

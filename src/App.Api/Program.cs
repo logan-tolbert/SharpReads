@@ -5,6 +5,7 @@ using App.Infrastructure.Services;
 using App.Infrastructure.Repositories;
 using Microsoft.AspNetCore.WebUtilities;
 using Scalar.AspNetCore;
+using Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,9 @@ builder.Services.AddAuthorization();
 builder.Services.AddSingleton<IApiKeyService, ApiKeyService>();
 builder.Services.AddSingleton<IBookRepository, BookRepository>();
 builder.Services.AddSingleton<IBookService, BookService>();
+
+// Register LoggerAdapter for dependency injection
+builder.Services.AddScoped(typeof(ILoggerAdapter<>), typeof(Logging.LoggerAdapter<>));
 
 var app = builder.Build();
 
