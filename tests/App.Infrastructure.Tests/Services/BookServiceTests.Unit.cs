@@ -2,7 +2,9 @@
 using App.Core.Entities;
 using App.Infrastructure.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Xunit;
 
 namespace App.Infrastructure.Tests.Services;
@@ -11,13 +13,15 @@ public class BookServiceTests
 {
   private readonly BookService _sut;
   private readonly IBookRepository _repo = Substitute.For<IBookRepository>();
+  private readonly ILogger<BookService> _logger = Substitute.For<ILogger<BookService>>();
+
   public BookServiceTests()
   {
-    _sut = new BookService(_repo);
+    _sut = new BookService(_logger ,_repo);
   }
 
   [Fact]
-  public async Task GetAllBooks_ShouldReturnEmptyEnumerable_WhenNoBooksExistAsync()
+  public async Task GetAllBooksAsync_ShouldReturnEmptyEnumerable_WhenNoBooksExist()
   {
     // Arrange
     _repo.GetAllAsync().Returns([]);
@@ -30,7 +34,7 @@ public class BookServiceTests
   }
 
   [Fact]
-  public async Task GetAllBooks_ShouldReturnEnumerableOfBooks_WhenBooksExistAsync()
+  public async Task GetAllBooks_ShouldReturnEnumerableOfBooks_WhenBooksExist()
   {
     // Arrange
     var expected = new[]
@@ -54,6 +58,38 @@ public class BookServiceTests
 
     // Assert
     books.Should().NotBeEmpty();
-    books.Should().HaveCount(10);
+    //books.Should().HaveCount(10);
+    books.Should().BeEquivalentTo(expected);
+  }
+
+  [Fact]
+  public async Task GetAllBooksAsync_ShouldLogMessages_WhenInvoked()
+  {
+    // Arrange
+    _repo.GetAllAsync().Returns([]);
+
+    // Act
+    await _sut.GetAllBooksAsync();
+
+    // Assert
+    _logger.Received(1).LogInformation(Arg.Is("Info: Retrieving all books."));
+    _logger.Received(1).LogInformation(Arg.Is<string?>(x => x!.StartsWith("Info: ")));
+    _logger.Received(1).LogInformation(Arg.Is("Info: Books retrieved in {0}ms"), Arg.Any<long>());
+  }
+
+  [Fact]
+  public async Task GetAllBooksAsync_ShouldLogMessageandException_WhenErrorOccurs()
+  {
+    // Arrange
+    var message = "An error occurred while retrieving all books.";
+    var exception = new Exception(message);
+    _repo.GetAllAsync().Throws(exception);
+
+    // Act
+    var result = async () => await _sut.GetAllBooksAsync();
+
+    // Assert
+    await result.Should().ThrowAsync<Exception>().WithMessage(message);
+    _logger.Received(1).LogError(Arg.Is(exception), Arg.Is(exception.Message));
   }
 }
